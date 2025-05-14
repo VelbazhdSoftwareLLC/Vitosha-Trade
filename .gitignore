@@ -17,6 +17,34 @@ out/
 .gradle/
 build/
 
+!gradle/wrapper/gradle-wrapper.properties
+gradle/wrapper/gradle-wrapper.jar
+
+# IDEA/Android Studio
+.idea/
+*.iml
+
+# Eclipse
+.classpath
+.project
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Generated files
+*.apk
+*.aar
+*.class
+
+# Distribution files
+*.jar
+*.war
+*.ear
+
 # Local configuration file (sdk path, etc)
 local.properties
 
@@ -39,3 +67,81 @@ captures/
 
 # Keystore files
 *.jks
+
+# PHP-specific files
+*.log
+*.env
+vendor/
+composer.lock
+
+# Node.js dependencies (if using npm/yarn)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.*
+*.env.local
+.env.*.local
+
+# MySQL dumps
+*.sql
+*.sql.gz
+
+# Cache, session, and temp files
+cache/
+tmp/
+*.bak
+*.swp
+*.tmp
+
+# IDE/Editor directories and files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.out
+*.pid
+*.seed
+
+# Compiled CSS (e.g., from Sass, Less)
+*.css.map
+*.scssc
+
+# Build directories (e.g., Webpack, Gulp)
+dist/
+build/
+coverage/
+*.min.js
+*.min.css
+
+# Composer dependencies (if using Composer)
+vendor/
+
+# Git-specific files
+.git/
+.gitignore
+
+# Backup files
+*.bak
+*.old
+*.swp
+*.swo
+
+# Sensitive data
+config.php
+config.inc.php
+database.php
+
+# Laravel/Lumen specific
+storage/
+bootstrap/cache/
