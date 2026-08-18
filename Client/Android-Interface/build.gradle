@@ -1,16 +1,27 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+}
+
+task prepareKotlinBuildScriptModel {}
 
 android {
     namespace 'eu.veldsoft.vitosha.trade'
-    compileSdkVersion 33
+    compileSdk 33
+
     defaultConfig {
         applicationId "eu.veldsoft.vitosha.trade"
-        minSdkVersion 25
-        targetSdkVersion 33
+        minSdk 33
+        targetSdk 33
         versionCode 1
         versionName "1.00"
         multiDexEnabled true
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+
     buildTypes {
         release {
             minifyEnabled false
