@@ -499,7 +499,7 @@ public class Predictor {
                 to = 0;
                 from++;
             }
-            if ((from + bias) >= network.getLayerNeuronCount(0)) {
+            if (from >= network.getLayerNeuronCount(0)) {
                 from = 0;
             }
             topology[1][i] = network.getWeight(0, from, to);
@@ -511,7 +511,7 @@ public class Predictor {
                 to = 0;
                 from++;
             }
-            if ((from + bias) >= network.getLayerNeuronCount(1)) {
+            if (from >= network.getLayerNeuronCount(1)) {
                 from = 0;
             }
             topology[3][i] = network.getWeight(1, from, to);
