@@ -16,14 +16,14 @@ import org.moeaframework.core.Problem;
 import org.moeaframework.core.Selection;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
-import org.moeaframework.core.operator.GAVariation;
-import org.moeaframework.core.operator.InjectedInitialization;
-import org.moeaframework.core.operator.TournamentSelection;
+import org.moeaframework.core.initialization.InjectedInitialization;
+import org.moeaframework.core.operator.CompoundVariation;
+import org.moeaframework.core.selection.TournamentSelection;
 import org.moeaframework.core.operator.UniformCrossover;
-import org.moeaframework.core.operator.UniformSelection;
+import org.moeaframework.core.selection.UniformSelection;
 import org.moeaframework.core.operator.binary.BitFlip;
 import org.moeaframework.core.operator.binary.HUX;
-import org.moeaframework.core.operator.real.DifferentialEvolutionSelection;
+import org.moeaframework.core.selection.DifferentialEvolutionSelection;
 import org.moeaframework.core.operator.real.DifferentialEvolutionVariation;
 import org.moeaframework.core.operator.real.UM;
 import org.moeaframework.core.variable.EncodingUtils;
@@ -114,19 +114,18 @@ public class MoeaOptimizer implements Optimizer {
         }
 
         AggregateObjectiveComparator comparator = new LinearDominanceComparator();
-        Initialization initialization = new InjectedInitialization(problem, populationSize, solutions);
+        Initialization initialization = new InjectedInitialization(problem, solutions);
 
         /* Select a random evolutionary optimizer. */
         Selection[] selections = {new TournamentSelection(), new UniformSelection(), new DifferentialEvolutionSelection(),};
         Variation[] crossovers = {new UniformCrossover(crossoverRate), new HUX(crossoverRate),};
         Variation[] mutations = {new BitFlip(mutationRate), new UM(mutationRate),};
         AbstractAlgorithm[] algorithms = {
-                new EvolutionStrategy(problem, comparator, initialization,
+                new EvolutionStrategy(problem, populationSize, comparator, initialization,
                         new SelfAdaptiveNormalVariation()),
-                new GeneticAlgorithm(problem, comparator, initialization,
-                        selections[PRNG.nextInt(selections.length)],
-                        new GAVariation(crossovers[PRNG.nextInt(crossovers.length)], mutations[PRNG.nextInt(mutations.length)])),
-                new DifferentialEvolution(problem, comparator, initialization,
+                new GeneticAlgorithm(problem, populationSize, comparator, initialization,
+                        new CompoundVariation(crossovers[PRNG.nextInt(crossovers.length)], mutations[PRNG.nextInt(mutations.length)])),
+                new DifferentialEvolution(problem, populationSize, comparator, initialization,
                         new DifferentialEvolutionSelection(),
                         new DifferentialEvolutionVariation(crossoverRate, scalingFactor))
         };
