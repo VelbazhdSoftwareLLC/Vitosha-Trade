@@ -3,17 +3,17 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_24
+    targetCompatibility = JavaVersion.VERSION_24
 }
 
 dependencies {
     implementation group: 'org.encog', name: 'encog-core', version: '3.4'
-    implementation group: 'org.json', name: 'json', version: '20260719'
+    implementation group: 'org.json', name: 'json', version: '20260814'
     implementation group: 'cz.msebera.android', name: 'httpclient', version: '4.5.8'
-    implementation group: 'org.moeaframework', name: 'moeaframework', version: '2.12'
+    implementation group: 'org.moeaframework', name: 'moeaframework', version: '2.13'
     implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
     implementation group: 'org.mariuszgromada.math', name: 'MathParser.org-mXparser', version: '6.1.1'
     implementation group: 'edu.gmu.cs', name: 'ecj', version: '22'
-    implementation group: 'io.jenetics', name: 'jenetics', version: '8.0.0'
+    implementation group: 'io.jenetics', name: 'jenetics', version: '8.3.0'
 }

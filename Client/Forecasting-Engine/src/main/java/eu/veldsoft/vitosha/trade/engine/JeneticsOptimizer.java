@@ -122,7 +122,7 @@ public class JeneticsOptimizer implements Optimizer {
         Engine<DoubleGene, Double> engine = Engine
                 .builder(
                         JeneticsOptimizer::fitness,
-                        Codecs.ofVector(DoubleRange.of(-Double.MAX_VALUE, Double.MAX_VALUE), weights.size()))
+                        Codecs.ofVector(new DoubleRange(-Double.MAX_VALUE, Double.MAX_VALUE), weights.size()))
                 .populationSize(populationSize)
                 .optimize(Optimize.MINIMUM)
                 .alterers(
