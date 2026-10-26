@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+//TODO Change to java.net.HttpURLConnection class.
 import cz.msebera.android.httpclient.HttpResponse;
 import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.client.ClientProtocolException;
@@ -19,6 +20,7 @@ import cz.msebera.android.httpclient.client.methods.HttpPost;
 import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
 import cz.msebera.android.httpclient.util.EntityUtils;
+
 import eu.veldsoft.vitosha.trade.dummy.InputData;
 
 /**
@@ -151,7 +153,7 @@ public class HttpHelper {
         double[] open = InputData.OPEN;
         double[] low = InputData.LOW;
         double[] high = InputData.HIGH;
-        double[] close = InputData.HIGH;
+        double[] close = InputData.CLOSE;
         double[] volume = InputData.VOLUME;
 
         HttpClient client = new DefaultHttpClient();
@@ -350,14 +352,14 @@ public class HttpHelper {
         pairs.add(new BasicNameValuePair("weights", "" + weights.trim()));
 
         //TODO Matrix transpose is possible.
-        String activites = "";
+        String activities = "";
         for (int j = 0; j < InputData.NEURONS.length; j++) {
             for (int i = 0; i < InputData.NEURONS.length; i++) {
-                activites += InputData.ACTIVITIES[i][j] + " ";
+                activities += InputData.ACTIVITIES[i][j] + " ";
             }
-            activites = activites.trim() + "\r\n";
+            activities = activities.trim() + "\r\n";
         }
-        pairs.add(new BasicNameValuePair("activites", "" + activites.trim()));
+        pairs.add(new BasicNameValuePair("activities", "" + activities.trim()));
 
         try {
             post.setEntity(new UrlEncodedFormEntity(pairs));
