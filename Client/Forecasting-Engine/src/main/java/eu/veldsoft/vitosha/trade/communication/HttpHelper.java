@@ -4,22 +4,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.logging.Logger;
-
-//TODO Change to java.net.HttpURLConnection class.
-import cz.msebera.android.httpclient.HttpResponse;
-import cz.msebera.android.httpclient.NameValuePair;
-import cz.msebera.android.httpclient.client.ClientProtocolException;
-import cz.msebera.android.httpclient.client.HttpClient;
-import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
-import cz.msebera.android.httpclient.client.methods.HttpPost;
-import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
-import cz.msebera.android.httpclient.message.BasicNameValuePair;
-import cz.msebera.android.httpclient.util.EntityUtils;
 
 import eu.veldsoft.vitosha.trade.dummy.InputData;
 
@@ -130,6 +126,24 @@ public class HttpHelper {
     private final String url;
 
     /**
+     * Read stream from the input stream.
+     *
+     * @param in Input stream.
+     * @return String with the read stream.
+     * @throws IOException If an I/O error occurs.
+     */
+    private String readStream(InputStream in) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+        StringBuilder out = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            out.append(line);
+        }
+        reader.close();
+        return out.toString();
+    }
+
+    /**
      * Constructor with all parameters needed.
      *
      * @param url Remote server URL address.
@@ -156,18 +170,20 @@ public class HttpHelper {
         double[] close = InputData.CLOSE;
         double[] volume = InputData.VOLUME;
 
-        HttpClient client = new DefaultHttpClient();
-        client.getParams().setParameter("http.protocol.content-charset", "UTF-8");
-
-        /*
-         * Load randomly selected ANN.
-         */
-        HttpPost post = new HttpPost("http://" + url.trim() + "/" + LOAD_RANDOM_ANN_SCRIPT);
-
         try {
-            HttpResponse response = client.execute(post);
+            HttpURLConnection connection = (HttpURLConnection) (new URL("http://" + url.trim() + "/" + LOAD_RANDOM_ANN_SCRIPT)).openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Accept-Charset", "UTF-8");
 
-            JSONObject result = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
+            /*
+             * Load randomly selected ANN.
+             */
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                return false;
+            }
+
+            JSONObject result = new JSONObject(readStream(connection.getInputStream()));
+            connection.disconnect();
 
             int size = result.getInt(JSON_SIZE_KEY);
 
@@ -214,33 +230,34 @@ public class HttpHelper {
                     activities[i][j] = array5.getDouble(i);
                 }
             }
-        } catch (ClientProtocolException exception) {
+        } catch (MalformedURLException exception) {
             return false;
         } catch (IOException exception) {
             return false;
         } catch (JSONException exception) {
-            return false;
-        } catch (Exception exception) {
             return false;
         }
 
         /*
          * Load training set for the selected ANN.
          */
-        post = new HttpPost("http://" + url.trim() + "/" + LOAD_TRAINING_SET_SCRIPT);
-        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-        pairs.add(new BasicNameValuePair("symbol", symbol));
-        pairs.add(new BasicNameValuePair("period", "" + period));
         try {
-            post.setEntity(new UrlEncodedFormEntity(pairs));
-        } catch (UnsupportedEncodingException e) {
-            return false;
-        }
+            HttpURLConnection connection = (HttpURLConnection) (new URL("http://" + url.trim() + "/" + LOAD_TRAINING_SET_SCRIPT)).openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 
-        try {
-            HttpResponse response = client.execute(post);
+            String parameters = "symbol=" + URLEncoder.encode(symbol, "UTF-8") + "&period=" + period;
+            try (OutputStream out = connection.getOutputStream()) {
+                out.write(parameters.getBytes("UTF-8"));
+                out.flush();
+            }
 
-            JSONObject result = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                return false;
+            }
+
+            JSONObject result = new JSONObject(readStream(connection.getInputStream()));
 
             int size = result.getInt(JSON_NUMBER_OF_EXAMPLES_KEY);
 
@@ -286,13 +303,9 @@ public class HttpHelper {
             for (int i = 0; i < array6.length(); i++) {
                 volume[i] = array6.getDouble(i);
             }
-        } catch (ClientProtocolException exception) {
-            return false;
         } catch (IOException exception) {
             return false;
         } catch (JSONException exception) {
-            return false;
-        } catch (Exception exception) {
             return false;
         }
 
@@ -321,57 +334,63 @@ public class HttpHelper {
      * @return True if the saving was successful, false otherwise.
      */
     public boolean store() {
-        HttpClient client = new DefaultHttpClient();
-        client.getParams().setParameter("http.protocol.content-charset", "UTF-8");
-
-        /*
-         * Store retrained ANN.
-         */
-        HttpPost post = new HttpPost("http://" + url.trim() + "/" + SAVE_RETRAINED_ANN_SCRIPT);
-        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-
-        pairs.add(new BasicNameValuePair("symbol", InputData.SYMBOL));
-        pairs.add(new BasicNameValuePair("period", "" + InputData.PERIOD));
-        pairs.add(new BasicNameValuePair("fitness", "" + InputData.FITNESS));
-        pairs.add(new BasicNameValuePair("number_of_neurons", "" + InputData.NEURONS.length));
-
-        String flags = "";
-        for (int i = 0; i < InputData.NEURONS.length; i++) {
-            flags += InputData.NEURONS[i] + " ";
-        }
-        pairs.add(new BasicNameValuePair("flags", "" + flags.trim()));
-
-        //TODO Matrix transpose is possible.
-        String weights = "";
-        for (int j = 0; j < InputData.NEURONS.length; j++) {
-            for (int i = 0; i < InputData.NEURONS.length; i++) {
-                weights += InputData.WEIGHTS[i][j] + " ";
-            }
-            weights = weights.trim() + "\r\n";
-        }
-        pairs.add(new BasicNameValuePair("weights", "" + weights.trim()));
-
-        //TODO Matrix transpose is possible.
-        String activities = "";
-        for (int j = 0; j < InputData.NEURONS.length; j++) {
-            for (int i = 0; i < InputData.NEURONS.length; i++) {
-                activities += InputData.ACTIVITIES[i][j] + " ";
-            }
-            activities = activities.trim() + "\r\n";
-        }
-        pairs.add(new BasicNameValuePair("activities", "" + activities.trim()));
-
         try {
-            post.setEntity(new UrlEncodedFormEntity(pairs));
-            client.execute(post);
-        } catch (ClientProtocolException exception) {
+            HttpURLConnection connection = (HttpURLConnection) (new URL("http://" + url.trim() + "/" + SAVE_RETRAINED_ANN_SCRIPT)).openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+
+            /*
+             * Store retrained ANN.
+             */
+            StringBuilder parameters = new StringBuilder();
+            parameters.append("symbol=").append(URLEncoder.encode(InputData.SYMBOL, "UTF-8"));
+            parameters.append("&period=").append(InputData.PERIOD);
+            parameters.append("&fitness=").append(InputData.FITNESS);
+            parameters.append("&number_of_neurons=").append(InputData.NEURONS.length);
+
+            StringBuilder flags = new StringBuilder();
+            for (int i = 0; i < InputData.NEURONS.length; i++) {
+                flags.append(InputData.NEURONS[i]).append(" ");
+            }
+            parameters.append("&flags=").append(URLEncoder.encode(flags.toString().trim(), "UTF-8"));
+
+            //TODO Matrix transpose is possible.
+            StringBuilder weights = new StringBuilder();
+            for (int j = 0; j < InputData.NEURONS.length; j++) {
+                for (int i = 0; i < InputData.NEURONS.length; i++) {
+                    weights.append(InputData.WEIGHTS[i][j]).append(" ");
+                }
+                weights.append("\r\n");
+            }
+            parameters.append("&weights=").append(URLEncoder.encode(weights.toString().trim(), "UTF-8"));
+
+            //TODO Matrix transpose is possible.
+            StringBuilder activities = new StringBuilder();
+            for (int j = 0; j < InputData.NEURONS.length; j++) {
+                for (int i = 0; i < InputData.NEURONS.length; i++) {
+                    activities.append(InputData.ACTIVITIES[i][j]).append(" ");
+                }
+                activities.append("\r\n");
+            }
+            parameters.append("&activities=").append(URLEncoder.encode(activities.toString().trim(), "UTF-8"));
+
+            try (OutputStream os = connection.getOutputStream()) {
+                os.write(parameters.toString().getBytes("UTF-8"));
+                os.flush();
+            }
+
+            int code = connection.getResponseCode();
+            connection.disconnect();
+            return code == HttpURLConnection.HTTP_OK;
+        } catch (MalformedURLException exception) {
+            return false;
+        } catch (ProtocolException exception) {
             return false;
         } catch (UnsupportedEncodingException exception) {
             return false;
         } catch (IOException exception) {
             return false;
         }
-
-        return true;
     }
 }
