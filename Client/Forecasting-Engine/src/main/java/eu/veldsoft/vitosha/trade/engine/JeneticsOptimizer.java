@@ -83,11 +83,12 @@ public class JeneticsOptimizer implements Optimizer {
 
         /*
          * Iterate over the training set in order to calculate network error.
+         * It is doing gradient descent step which modifies the weights and gives a little bit of irrelevant fitness.
          */
         propagation.iteration();
 
         /*
-         * Total ANN error is used as fitness value. The bigger the fitness, the better the
+         * Total ANN error is used as fitness value. The smaller the fitness, the better the
          * chromosome. If the error go to zero it can lead to division by zero run-time exception.
          */
         return propagation.getError();
@@ -122,7 +123,7 @@ public class JeneticsOptimizer implements Optimizer {
         Engine<DoubleGene, Double> engine = Engine
                 .builder(
                         JeneticsOptimizer::fitness,
-                        Codecs.ofVector(new DoubleRange(-Double.MAX_VALUE, Double.MAX_VALUE), weights.size()))
+                        Codecs.ofVector(new DoubleRange(-1D, +1D), weights.size()))
                 .populationSize(populationSize)
                 .optimize(Optimize.MINIMUM)
                 .alterers(

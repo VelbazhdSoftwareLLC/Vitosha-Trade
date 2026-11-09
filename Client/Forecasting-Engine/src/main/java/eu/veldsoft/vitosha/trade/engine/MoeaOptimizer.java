@@ -13,16 +13,14 @@ import org.moeaframework.core.Initialization;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.PRNG;
 import org.moeaframework.core.Problem;
-import org.moeaframework.core.Selection;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 import org.moeaframework.core.initialization.InjectedInitialization;
 import org.moeaframework.core.operator.CompoundVariation;
-import org.moeaframework.core.selection.TournamentSelection;
+import org.moeaframework.core.operator.real.PCX;
+import org.moeaframework.core.operator.real.PM;
+import org.moeaframework.core.operator.real.SPX;
 import org.moeaframework.core.operator.UniformCrossover;
-import org.moeaframework.core.selection.UniformSelection;
-import org.moeaframework.core.operator.binary.BitFlip;
-import org.moeaframework.core.operator.binary.HUX;
 import org.moeaframework.core.selection.DifferentialEvolutionSelection;
 import org.moeaframework.core.operator.real.DifferentialEvolutionVariation;
 import org.moeaframework.core.operator.real.UM;
@@ -117,9 +115,9 @@ public class MoeaOptimizer implements Optimizer {
         Initialization initialization = new InjectedInitialization(problem, solutions);
 
         /* Select a random evolutionary optimizer. */
-        Selection[] selections = {new TournamentSelection(), new UniformSelection(), new DifferentialEvolutionSelection(),};
-        Variation[] crossovers = {new UniformCrossover(crossoverRate), new HUX(crossoverRate),};
-        Variation[] mutations = {new BitFlip(mutationRate), new UM(mutationRate),};
+        //TODO Selection[] selections = {new TournamentSelection(), new UniformSelection(), new DifferentialEvolutionSelection(),};
+        Variation[] crossovers = {new UniformCrossover(crossoverRate), new SPX(), new PCX(),};
+        Variation[] mutations = {new UM(mutationRate), new PM(mutationRate,Math.random()+19.5D),};
         AbstractAlgorithm[] algorithms = {
                 new EvolutionStrategy(problem, populationSize, comparator, initialization,
                         new SelfAdaptiveNormalVariation()),

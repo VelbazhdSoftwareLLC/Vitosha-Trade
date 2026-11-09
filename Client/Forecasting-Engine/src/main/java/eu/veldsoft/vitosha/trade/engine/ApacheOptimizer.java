@@ -6,9 +6,9 @@ import org.apache.commons.math3.genetics.FixedElapsedTime;
 import org.apache.commons.math3.genetics.GeneticAlgorithm;
 import org.apache.commons.math3.genetics.Population;
 import org.apache.commons.math3.genetics.TournamentSelection;
-import org.apache.commons.math3.genetics.UniformBinaryMutation;
 import org.apache.commons.math3.genetics.UniformCrossover;
 import org.apache.commons.math3.genetics.WeightsChromosome;
+import org.apache.commons.math3.genetics.RandomKeyMutation;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.training.propagation.Propagation;
 
@@ -70,7 +70,7 @@ public class ApacheOptimizer implements Optimizer {
     /**
      * Constructor with all parameters.
      *
-     * @param optimizationTimeout Optimization time.
+     * @param optimizationTimeout Optimization time in milliseconds.
      * @param network             Artificial neural network reference.
      * @param propagation         Training rule reference.
      * @param populationSize      Evolutionary algorithm population size.
@@ -80,7 +80,7 @@ public class ApacheOptimizer implements Optimizer {
      * @param elitismRate         Elitism rate.
      */
     public ApacheOptimizer(long optimizationTimeout, BasicNetwork network, Propagation propagation, int populationSize, int tournamentArity, double crossoverRate, double mutationRate, double elitismRate) {
-        this.optimizationTimeout = optimizationTimeout;
+        this.optimizationTimeout = optimizationTimeout / 1000;
         this.network = network;
         this.propagation = propagation;
         this.populationSize = populationSize;
@@ -111,7 +111,7 @@ public class ApacheOptimizer implements Optimizer {
          */
         GeneticAlgorithm algorithm = new GeneticAlgorithm(
                 new UniformCrossover<WeightsChromosome>(0.5),
-                crossoverRate, new UniformBinaryMutation(),
+                crossoverRate, new RandomKeyMutation(),
                 mutationRate, new TournamentSelection(tournamentArity));
 
         /*

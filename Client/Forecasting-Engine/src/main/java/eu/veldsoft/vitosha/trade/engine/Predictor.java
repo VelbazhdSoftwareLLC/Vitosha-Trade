@@ -103,7 +103,7 @@ public class Predictor {
          * Use range of double values.
          */
         double[] check = {
-                Double.MIN_VALUE, -0.000001, -0.00001, -0.0001,
+                -Double.MIN_VALUE, -0.000001, -0.00001, -0.0001,
                 -0.001, -0.01, -0.1, -1, -10, -100, -1000,
                 -10000, -100000, -1000000, 0, 0.000001, 0.00001,
                 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000,
@@ -532,7 +532,7 @@ public class Predictor {
          * Weights normalization.
          */
         double min = Double.MAX_VALUE;
-        double max = Double.MIN_VALUE;
+        double max = -Double.MAX_VALUE;
         for (double value : topology[1]) {
             if (value < min) {
                 min = value;
