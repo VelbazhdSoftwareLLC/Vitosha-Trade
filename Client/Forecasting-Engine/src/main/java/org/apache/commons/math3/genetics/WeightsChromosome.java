@@ -43,7 +43,7 @@ public class WeightsChromosome extends AbstractListChromosome<Double> {
      *                                        are not valid.
      */
     public WeightsChromosome(Double[] representation,
-                             BasicNetwork network, Train train)
+            BasicNetwork network, Train train)
             throws InvalidRepresentationException {
         super(representation);
         this.network = network;
@@ -70,7 +70,7 @@ public class WeightsChromosome extends AbstractListChromosome<Double> {
      *                                        are not valid.
      */
     public WeightsChromosome(List<Double> representation,
-                             BasicNetwork network, Train train)
+            BasicNetwork network, Train train)
             throws InvalidRepresentationException {
         super(representation);
         this.network = network;
@@ -96,7 +96,7 @@ public class WeightsChromosome extends AbstractListChromosome<Double> {
      * @param train          Neural network training strategy.
      */
     public WeightsChromosome(List<Double> representation, boolean copy,
-                             BasicNetwork network, Train train) {
+            BasicNetwork network, Train train) {
         super(representation, copy);
         this.network = network;
         this.train = train;
@@ -144,7 +144,8 @@ public class WeightsChromosome extends AbstractListChromosome<Double> {
         train.iteration();
 
         /*
-         * Total ANN error is used as fitness value. The bigger the fitness, the better the chromosome.
+         * Total ANN error is used as fitness value. The bigger the fitness, the better
+         * the chromosome.
          */
         fitness = -train.getError();
     }
@@ -164,7 +165,8 @@ public class WeightsChromosome extends AbstractListChromosome<Double> {
     protected void checkValidity(List<Double> values)
             throws InvalidRepresentationException {
         if (network == null) {
-            //TODO throw new RuntimeException("Neural network should be provided for the fitness evaluation.");
+            // TODO throw new RuntimeException("Neural network should be provided for the
+            // fitness evaluation.");
             return;
         }
 
@@ -202,6 +204,6 @@ public class WeightsChromosome extends AbstractListChromosome<Double> {
      * @return List with chromosome values.
      */
     public List<Double> getRepresentation() {
-        return getRepresentation();
+        return super.getRepresentation();
     }
 }
